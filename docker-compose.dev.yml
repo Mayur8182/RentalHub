@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # ── Local MongoDB for development ─────────────────────────────────────────
+  mongodb:
+    image: mongo:7.0
+    container_name: rentalhub-mongo-dev
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: rentalhub-dev
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - rentalhub-dev
+
+  # ── Backend API (development) ──────────────────────────────────────────────
+  backend-dev:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: rentalhub-backend-dev
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGO_URI: mongodb://admin:password@mongodb:27017/rentalhub-dev?authSource=admin
+      JWT_SECRET: 7f3a9c2e1b8d4f6e0a5c7d9b2e4f1a8c3d6e9b2f5a8c1d4e7f0a3b6c9d2e5f8a1b4c7d0e3f6a9b2c5d8e1f4a7b0c3d6e9f2a5b8c1d4e7f0a3b6
+      FRONTEND_URL: http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - rentalhub-dev
+
+volumes:
+  mongodb_data:
+
+networks:
+  rentalhub-dev:
+    driver: bridge

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { vehicleAPI } from '../utils/api';
+import { vehicleAPI, categoryAPI } from '../utils/api';
 import Hero from '../components/Hero';
 import FavoriteButton from '../components/FavoriteButton';
 import { VehicleCardSkeleton } from '../components/Skeleton';
@@ -38,7 +38,7 @@ function Fleet() {
       setLoading(true);
       const [vehiclesRes, categoriesRes] = await Promise.all([
         vehicleAPI.getAll(),
-        fetch('http://localhost:5000/api/categories').then(res => res.json())
+        categoryAPI.getAll()
       ]);
       setVehicles(vehiclesRes.data);
       setCategories(categoriesRes.data || []);
@@ -70,11 +70,12 @@ function Fleet() {
 
     setCheckingAvailability(true);
     const availabilityResults = {};
+    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
     try {
       // Check availability for each vehicle
       for (const vehicle of vehicles) {
-        const response = await fetch('http://localhost:5000/api/vehicles/check-availability', {
+        const response = await fetch(`${baseURL}/api/vehicles/check-availability`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

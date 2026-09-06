@@ -4,12 +4,13 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci
+# Use npm install instead of npm ci to handle lock file mismatches
+RUN npm install --legacy-peer-deps
 
 COPY . .
 
-# VITE_API_URL will be injected at build time via --build-arg
-ARG VITE_API_URL=https://api.yourdomain.com
+# Inject API URL at build time
+ARG VITE_API_URL=http://rentcarhub.duckdns.org
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
@@ -17,13 +18,10 @@ RUN npm run build
 # ── Stage 2: serve with Nginx ──────────────────────────────────────────────
 FROM nginx:1.25-alpine
 
-# Remove default config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy our custom Nginx config
 COPY nginx.conf /etc/nginx/conf.d/app.conf
 
-# Copy built assets
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 80
