@@ -5,13 +5,11 @@ dotenv.config();
 
 const connectDB = async (retries = 5) => {
     try {
-        // Simplified connection options for newer Mongoose versions
+        // Minimal connection options for compatibility
         const options = {
             serverSelectionTimeoutMS: 10000, // 10 seconds timeout
             socketTimeoutMS: 45000, // Close sockets after 45 seconds
             maxPoolSize: 10, // Maintain up to 10 socket connections
-            bufferMaxEntries: 0,
-            bufferCommands: false,
         };
 
         const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rentalhub', options);

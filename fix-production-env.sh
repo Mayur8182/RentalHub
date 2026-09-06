@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Fix production environment variables on EC2
+# Fix production MongoDB connection issues on EC2
 # Run this on EC2 server after deployment fails
 
-echo "🔧 Fixing production environment variables..."
+echo "🔧 Fixing MongoDB connection issues..."
 
 # Create/update backend/.env.production with correct MongoDB URL
 cat > backend/.env.production << 'EOF'
@@ -28,10 +28,24 @@ VITE_API_URL=http://rentcarhub.duckdns.org:5000
 EOF
 
 echo "✅ Environment files updated!"
-echo "🔄 Restarting containers..."
+echo "🧹 Cleaning Docker cache..."
 
-# Rebuild and restart containers
-sudo docker compose down
-sudo docker compose up -d --build --remove-orphans
+# Stop and remove all containers
+sudo docker compose down --remove-orphans
 
-echo "🎉 Done! Check status with: sudo docker compose ps"
+# Remove old images to force fresh build
+sudo docker image rm rentalhub-backend rentalhub-frontend rentalhub-proxy 2>/dev/null || true
+sudo docker system prune -f
+
+echo "🔄 Building and starting containers with fresh code..."
+
+# Rebuild everything from scratch
+sudo docker compose up -d --build --force-recreate
+
+echo ""
+echo "🎉 Done! Checking container status..."
+sleep 10
+sudo docker compose ps
+echo ""
+echo "📋 Backend logs:"
+sudo docker logs rentalhub-backend --tail 10
