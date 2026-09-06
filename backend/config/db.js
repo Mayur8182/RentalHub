@@ -5,10 +5,8 @@ dotenv.config();
 
 const connectDB = async (retries = 5) => {
     try {
-        // Connection options for better reliability
+        // Simplified connection options for newer Mongoose versions
         const options = {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
             serverSelectionTimeoutMS: 10000, // 10 seconds timeout
             socketTimeoutMS: 45000, // Close sockets after 45 seconds
             maxPoolSize: 10, // Maintain up to 10 socket connections
