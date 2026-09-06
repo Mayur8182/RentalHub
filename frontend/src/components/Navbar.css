@@ -1,0 +1,125 @@
+.brand-icon {
+  margin-right: 8px;
+  font-size: 24px;
+}
+
+.navbar-dark {
+  background-color: #111111 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #E8E8E8;
+}
+
+.navbar-brand {
+  font-size: 22px;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: #FFFFFF !important;
+}
+
+.nav-link {
+  margin-left: 25px;
+  transition: all 0.3s ease;
+  position: relative;
+  color: #FFFFFF !important;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #F4F1E8;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.navbar-toggler {
+  border-color: #F4F1E8;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.25rem rgba(244, 241, 232, 0.25);
+}
+
+.nav-link-login {
+  background-color: #F4F1E8;
+  color: #111111 !important;
+  padding: 6px 18px !important;
+  border-radius: 2px;
+  font-weight: 600 !important;
+  transition: all 0.3s ease;
+  margin-left: 25px;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-link-login:hover {
+  background-color: #FFFFFF;
+  color: #111111 !important;
+}
+
+.nav-link-login::after {
+  display: none;
+}
+
+.nav-link-logout {
+  background-color: #DC3545;
+  color: #FFFFFF !important;
+  padding: 6px 18px !important;
+  border-radius: 2px;
+  font-weight: 600 !important;
+  transition: all 0.3s ease;
+  margin-left: 25px;
+  border: none;
+  cursor: pointer;
+}
+
+.nav-link-logout:hover {
+  background-color: #C82333;
+  color: #FFFFFF !important;
+}
+
+.nav-link-logout::after {
+  display: none;
+}
+
+/* Favorites heart in navbar */
+.nav-link-favorites {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 18px !important;
+  color: #e74c3c !important;
+  padding: 0 4px !important;
+}
+
+.nav-link-favorites:hover {
+  color: #ff6b6b !important;
+}
+
+.nav-link-favorites::after {
+  display: none;
+}
+
+.nav-fav-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: #e74c3c;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}

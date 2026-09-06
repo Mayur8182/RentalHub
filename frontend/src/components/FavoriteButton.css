@@ -1,0 +1,50 @@
+.fav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ddd;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.18s ease, border-color 0.18s ease,
+              background 0.18s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+/* Sizes */
+.fav-btn--sm {
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+}
+
+.fav-btn--md {
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+}
+
+/* Idle hover */
+.fav-btn:hover {
+  border-color: #e74c3c;
+  color: #e74c3c;
+  transform: scale(1.1);
+}
+
+/* Active (favorited) */
+.fav-btn--active {
+  background: #fff0f0;
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
+.fav-btn--active:hover {
+  background: #ffe4e4;
+  transform: scale(1.1);
+}
+
+/* Pop animation on toggle */
+.fav-btn:active {
+  transform: scale(0.92);
+}

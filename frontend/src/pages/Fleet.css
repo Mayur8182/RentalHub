@@ -1,0 +1,81 @@
+.fleet-page h2 {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 36px;
+  font-weight: 700;
+  color: #111111;
+  letter-spacing: -0.5px;
+}
+
+.fleet-section {
+  padding: 60px 20px;
+  background-color: #FFFFFF;
+}
+
+.fleet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.vehicle-card {
+  background: #FFFFFF;
+  border-radius: 2px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #E8E8E8;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vehicle-image {
+  font-size: 64px;
+  margin-bottom: 15px;
+}
+
+.vehicle-card h3 {
+  color: #111111;
+  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.vehicle-type {
+  color: #555555;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.vehicle-capacity {
+  color: #999999;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.vehicle-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111111;
+  margin-bottom: 15px;
+  letter-spacing: -0.5px;
+}
+
+.vehicle-card .btn {
+  width: 100%;
+}
+
+/* Favorite button overlay on fleet cards */
+.fleet-card-fav {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}

@@ -1,0 +1,578 @@
+/* ── Page shell ─────────────────────────────────────────────────────────── */
+.vd-page {
+  min-height: calc(100vh - 76px);
+  background-color: #F4F1E8;
+  padding: 32px 0 64px;
+}
+
+/* ── Loading / error states ─────────────────────────────────────────────── */
+.vd-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 16px;
+  color: #555;
+}
+
+.vd-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E8E8E8;
+  border-top-color: #111;
+  border-radius: 50%;
+  animation: vd-spin 0.8s linear infinite;
+}
+
+@keyframes vd-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Breadcrumb ─────────────────────────────────────────────────────────── */
+.vd-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+.vd-breadcrumb a {
+  color: #555;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.vd-breadcrumb a:hover {
+  color: #111;
+}
+
+.vd-breadcrumb span:last-child {
+  color: #111;
+  font-weight: 600;
+}
+
+/* ── Two-column layout ──────────────────────────────────────────────────── */
+.vd-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── Left column ────────────────────────────────────────────────────────── */
+.vd-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Image */
+.vd-image-wrap {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.vd-image {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.vd-availability-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.vd-availability-badge.available {
+  background-color: rgba(40, 167, 69, 0.92);
+  color: #fff;
+}
+
+.vd-availability-badge.unavailable {
+  background-color: rgba(220, 53, 69, 0.92);
+  color: #fff;
+}
+
+/* Name + price header */
+.vd-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  background: #fff;
+  padding: 20px 24px;
+  border-radius: 8px;
+  border: 1px solid #E8E8E8;
+}
+
+/* Name + heart on the same row */
+.vd-name-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.vd-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.vd-brand {
+  font-size: 15px;
+  color: #777;
+  margin: 0;
+}
+
+.vd-price-block {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.vd-price {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111;
+}
+
+.vd-per-day {
+  font-size: 14px;
+  color: #888;
+  margin-left: 2px;
+}
+
+/* Specs grid */
+.vd-specs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.vd-spec-item {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: box-shadow 0.2s;
+}
+
+.vd-spec-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.vd-spec-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.vd-spec-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #999;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.vd-spec-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+}
+
+/* Generic section wrapper */
+.vd-section {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.vd-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #F4F1E8;
+}
+
+.vd-description {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #555;
+  margin: 0;
+}
+
+/* Features list */
+.vd-features-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 20px;
+}
+
+.vd-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.vd-feature-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background-color: #111;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* ── Right column — booking card ────────────────────────────────────────── */
+.vd-right {
+  position: sticky;
+  top: 100px;
+}
+
+.vd-booking-card {
+  background: #fff;
+  border: 1px solid #E8E8E8;
+  border-radius: 12px;
+  padding: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.vd-booking-header {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #F0F0F0;
+  margin-bottom: 22px;
+}
+
+.vd-booking-price {
+  font-size: 32px;
+  font-weight: 800;
+  color: #111;
+}
+
+.vd-booking-per-day {
+  font-size: 15px;
+  color: #888;
+}
+
+/* Date grid */
+.vd-date-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.vd-same-location-row {
+  margin-bottom: 10px;
+}
+
+.vd-date-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vd-date-field label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #888;
+}
+
+.vd-date-field .form-control {
+  font-size: 14px;
+  padding: 10px 12px;
+}
+
+/* Live total box */
+.vd-total-box {
+  background: #F4F1E8;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.vd-total-placeholder {
+  font-size: 14px;
+  color: #999;
+  text-align: center;
+  margin: 0;
+}
+
+.vd-total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555;
+}
+
+.vd-total-final {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  padding-top: 8px;
+  border-top: 1px solid #E0DDD4;
+  margin-top: 2px;
+}
+
+/* Book button */
+.vd-book-btn {
+  width: 100%;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.vd-book-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error */
+.vd-booking-error {
+  background: #fff0f0;
+  color: #c0392b;
+  border: 1px solid #f5c6cb;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+/* Login / unavailable prompts */
+.vd-login-prompt,
+.vd-unavailable-msg {
+  text-align: center;
+  color: #555;
+  font-size: 15px;
+}
+
+.vd-login-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .vd-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .vd-right {
+    position: static;
+  }
+
+  .vd-specs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vd-image {
+    height: 280px;
+  }
+}
+
+@media (max-width: 500px) {
+  .vd-specs-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .vd-features-list {
+    grid-template-columns: 1fr;
+  }
+
+  .vd-date-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vd-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .vd-price-block {
+    text-align: left;
+  }
+}
+
+/* ── Location row (input + map button) ─────────────────────────────────── */
+.vd-location-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.vd-location-row .form-control {
+  flex: 1;
+}
+
+.vd-map-btn {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border: 1.5px solid #E8E8E8;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.vd-map-btn:hover:not(:disabled) {
+  background: #F4F1E8;
+  border-color: #111;
+}
+
+.vd-map-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Extra services ─────────────────────────────────────────────────────── */
+.vd-extras-section {
+  margin-bottom: 14px;
+}
+
+.vd-extras-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.vd-extras-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.vd-extra-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1.5px solid #E8E8E8;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: #fff;
+}
+
+.vd-extra-item input[type="checkbox"] { display: none; }
+
+.vd-extra-item.active {
+  border-color: #111;
+  background: #F4F1E8;
+}
+
+.vd-extra-icon { font-size: 18px; flex-shrink: 0; }
+
+.vd-extra-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.vd-extra-label { font-size: 12px; font-weight: 600; color: #111; }
+.vd-extra-price { font-size: 11px; color: #9CA3AF; }
+
+/* ── Coupon ──────────────────────────────────────────────────────────────── */
+.vd-coupon-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.vd-coupon-input {
+  flex: 1;
+  font-family: monospace !important;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.vd-coupon-btn {
+  padding: 0 16px;
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.vd-coupon-btn:hover:not(:disabled) { background: #000; }
+.vd-coupon-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.vd-coupon-success {
+  background: #D1FAE5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.vd-coupon-error {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+/* ── Price breakdown rows ────────────────────────────────────────────────── */
+.vd-surcharge     { color: #F59E0B; }
+.vd-discount-row  { color: #059669; }

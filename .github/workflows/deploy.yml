@@ -1,0 +1,36 @@
+name: Deploy to EC2 — rentcarhub.duckdns.org
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: SSH → EC2 (44.220.153.2) → docker compose up
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     44.220.153.2
+          username: ${{ secrets.EC2_USER }}
+          key:      ${{ secrets.EC2_SSH_KEY }}
+          port:     22
+          script: |
+            set -e
+            cd /home/ubuntu/RentalHub
+
+            echo "→ Pulling latest code from GitHub"
+            git pull origin main
+
+            echo "→ Rebuilding and restarting containers"
+            docker compose up -d --build --remove-orphans
+
+            echo "→ Cleaning up old images"
+            docker image prune -f
+
+            echo "✅ Deployment complete — http://rentcarhub.duckdns.org"

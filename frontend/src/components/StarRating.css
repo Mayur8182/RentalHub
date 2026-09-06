@@ -1,0 +1,75 @@
+/* ── Container ──────────────────────────────────────────────────────────── */
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  line-height: 1;
+  user-select: none;
+}
+
+/* ── Sizes ──────────────────────────────────────────────────────────────── */
+.stars--sm  .star { font-size: 14px; }
+.stars--md  .star { font-size: 20px; }
+.stars--lg  .star { font-size: 28px; }
+
+/* ── Star states ────────────────────────────────────────────────────────── */
+.star {
+  display: inline-block;
+  color: #ddd;
+  transition: color 0.12s ease, transform 0.1s ease;
+  position: relative;
+}
+
+.star--full {
+  color: #f4b942;
+}
+
+/* Partial fill using clip-path trick */
+.star--partial {
+  color: #ddd;
+}
+
+.star--partial::before {
+  content: '★';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #f4b942;
+  width: var(--fill, 0%);
+  overflow: hidden;
+  display: block;
+}
+
+/* ── Interactive mode ───────────────────────────────────────────────────── */
+.stars--interactive .star {
+  cursor: pointer;
+}
+
+.stars--interactive .star:hover,
+.stars--interactive .star--full {
+  color: #f4b942;
+}
+
+.stars--interactive .star:hover {
+  transform: scale(1.2);
+}
+
+.stars--interactive .star:active {
+  transform: scale(0.95);
+}
+
+/* ── Numeric value ──────────────────────────────────────────────────────── */
+.stars-value {
+  font-size: 0.85em;
+  font-weight: 700;
+  color: #111;
+  margin-left: 6px;
+}
+
+/* ── Review count ───────────────────────────────────────────────────────── */
+.stars-count {
+  font-size: 0.75em;
+  color: #888;
+  margin-left: 4px;
+  font-weight: 500;
+}

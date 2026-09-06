@@ -1,0 +1,606 @@
+# Design Document - Platform Improvements
+
+## Overview
+
+This design document outlines the technical implementation approach for three platform improvements: conditional footer rendering in admin routes, contact query management system with full CRUD operations, and home page modernization with improved visual design and user experience.
+
+The improvements will enhance both the administrative experience and the end-user interface while maintaining the existing architecture patterns established in the RentalHub application.
+
+## Architecture
+
+### High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Frontend (React)                      │
+├─────────────────────────────────────────────────────────┤
+│  App.jsx                                                 │
+│    ├─ Conditional Footer Rendering (useLocation hook)   │
+│    └─ New Route: /admin/contacts                        │
+│                                                          │
+│  Pages                                                   │
+│    ├─ Contact.jsx (Enhanced with API integration)       │
+│    ├─ Home.jsx (Modernized components)                  │
+│    └─ Admin/ContactManagement.jsx (New)                 │
+│                                                          │
+│  Components                                              │
+│    ├─ Banner.jsx (Enhanced hero section)                │
+│    ├─ Funfacts.jsx (Remove emojis, modern cards)        │
+│    └─ Blog.jsx (Clean up emoji usage)                   │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            │ HTTP/REST API
+                            ▼
+┌─────────────────────────────────────────────────────────┐
+│                  Backend (Node/Express)                  │
+├─────────────────────────────────────────────────────────┤
+│  Routes                                                  │
+│    └─ contactRoutes.js (New)                            │
+│         ├─ POST   /api/contacts                         │
+│         ├─ GET    /api/admin/contacts                   │
+│         └─ PATCH  /api/admin/contacts/:id/status        │
+│                                                          │
+│  Controllers                                             │
+│    └─ contactController.js (New)                        │
+│         ├─ createContact()                              │
+│         ├─ getAllContacts()                             │
+│         └─ updateContactStatus()                        │
+│                                                          │
+│  Models                                                  │
+│    └─ Contact.js (New)                                  │
+│         ├─ name: String                                 │
+│         ├─ email: String                                │
+│         ├─ phone: String                                │
+│         ├─ message: String                              │
+│         ├─ status: Enum ['pending', 'resolved']         │
+│         └─ timestamps                                   │
+└─────────────────────────────────────────────────────────┘
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │   MongoDB     │
+                    │  (contacts)   │
+                    └───────────────┘
+```
+
+## Components and Interfaces
+
+### 1. Admin Layout Footer Fix
+
+#### App.jsx Enhancement
+```javascript
+import { useLocation } from 'react-router-dom';
+
+function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+  
+  return (
+    <div className="app-container">
+      <Navbar />
+      <main>
+        <Routes>
+          {/* ... existing routes */}
+        </Routes>
+      </main>
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+}
+```
+
+**Design Rationale:**
+- Uses React Router's `useLocation` hook to detect current route
+- Conditionally renders footer based on route path prefix
+- Minimal performance impact as it's a simple string comparison
+- No changes needed to existing Footer component
+
+#### Admin Dashboard CSS Enhancement
+```css
+.admin-dashboard {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-content {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #F4F1E8;
+}
+```
+
+### 2. Contact Query Management System
+
+#### Data Model - Contact.js
+
+```javascript
+const contactSchema = mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true
+  },
+  phone: {
+    type: String,
+    trim: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'resolved'],
+    default: 'pending'
+  }
+}, {
+  timestamps: true
+});
+```
+
+**Design Decisions:**
+- Status field limited to two states for simplicity
+- Timestamps auto-generated by Mongoose
+- Email stored in lowercase for consistency
+- All text fields trimmed to prevent whitespace issues
+
+#### API Endpoints
+
+**Public Endpoint:**
+```
+POST /api/contacts
+Body: { name, email, phone, message }
+Response: { success, message, contactId }
+```
+
+**Admin Endpoints:**
+```
+GET /api/admin/contacts?status=pending|resolved|all
+Response: { contacts: [...] }
+
+PATCH /api/admin/contacts/:id/status
+Body: { status: 'pending' | 'resolved' }
+Response: { success, contact }
+```
+
+#### Controller Logic - contactController.js
+
+```javascript
+// Create contact query (public)
+export const createContact = async (req, res) => {
+  // Validate input
+  // Create contact document
+  // Return success response
+};
+
+// Get all contacts (admin only)
+export const getAllContacts = async (req, res) => {
+  // Parse status filter from query params
+  // Fetch contacts with optional filter
+  // Sort by creation date (newest first)
+  // Return contacts array
+};
+
+// Update contact status (admin only)
+export const updateContactStatus = async (req, res) => {
+  // Validate status value
+  // Find and update contact
+  // Return updated contact
+};
+```
+
+#### Frontend - ContactManagement.jsx
+
+```javascript
+// Component structure:
+- State: contacts[], filter, loading, error
+- useEffect: Fetch contacts on mount and filter change
+- UI Components:
+  * Filter tabs (All, Pending, Resolved)
+  * Contact table with columns:
+    - Name
+    - Email
+    - Phone
+    - Message (truncated with expand)
+    - Date
+    - Status badge
+    - Actions (Mark as Resolved/Pending)
+  * Empty state when no contacts
+  * Loading spinner
+  * Error message display
+```
+
+**Styling Approach:**
+- Reuse existing admin table styles
+- Color-coded status badges (orange: pending, green: resolved)
+- Responsive table design
+- Modal or expandable row for full message view
+
+#### Contact.jsx Enhancement
+
+```javascript
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  
+  try {
+    const response = await fetch('/api/contacts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData)
+    });
+    
+    if (response.ok) {
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', message: '' });
+    } else {
+      setError('Failed to send message');
+    }
+  } catch (error) {
+    setError('Network error');
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+#### Admin Dashboard Stats Integration
+
+```javascript
+// In adminController.js - getAdminStats()
+const pendingContacts = await Contact.countDocuments({ 
+  status: 'pending' 
+});
+
+res.json({
+  totalUsers,
+  totalVehicles,
+  totalBookings,
+  totalRevenue,
+  pendingContacts  // Add to stats
+});
+```
+
+### 3. Home Page Enhancement
+
+#### Component Improvements
+
+**Banner.jsx (Hero Section)**
+```javascript
+// Enhanced hero with:
+- Full-width background image or gradient
+- Large, bold headline with value proposition
+- Subheading with key benefits
+- Two CTA buttons: "Browse Fleet" and "Learn More"
+- Modern typography (larger fonts, better spacing)
+- Overlay to ensure text readability
+```
+
+**CSS Design:**
+```css
+.banner-hero {
+  min-height: 70vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0.95;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.hero-btn {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+}
+```
+
+**Funfacts.jsx Enhancement**
+```javascript
+// Remove emoji symbols
+// Replace with:
+- Icon components (react-icons library)
+- OR simple numeric display
+- Modern card design with subtle shadows
+- Animated counter effect on scroll (optional)
+
+// Stats to display:
+- 500+ Vehicles
+- 10,000+ Happy Customers
+- 15+ Years of Service
+- 98% Satisfaction Rate
+```
+
+**CSS Design:**
+```css
+.funfacts-section {
+  padding: 5rem 0;
+  background: #F8F9FA;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 500;
+}
+```
+
+**Blog.jsx Cleanup**
+```javascript
+// Remove emoji usage
+// Use proper icon components
+// Improve card hover effects
+// Better image handling
+// Modern spacing and typography
+```
+
+**Request.jsx Enhancement**
+```javascript
+// Improve "Why Choose Us" section
+// Use icons instead of emojis
+// Better card layouts
+// Add subtle animations
+```
+
+## Data Models
+
+### Contact Model Schema
+
+```javascript
+{
+  name: String (required, trimmed),
+  email: String (required, trimmed, lowercase),
+  phone: String (optional, trimmed),
+  message: String (required),
+  status: Enum ['pending', 'resolved'] (default: 'pending'),
+  createdAt: Date (auto-generated),
+  updatedAt: Date (auto-generated)
+}
+```
+
+**Indexes:**
+- `status` - for efficient filtering in admin panel
+- `createdAt` - for sorting by submission date
+
+## Error Handling
+
+### Contact Form Submission Errors
+
+```javascript
+// Frontend error states:
+- Network errors (no internet connection)
+- Server errors (500)
+- Validation errors (400)
+- Rate limiting (429)
+
+// Error display:
+- Toast notification or inline error message
+- Maintain form data on error
+- Clear error on retry
+```
+
+### Admin Contact Management Errors
+
+```javascript
+// Error scenarios:
+- Failed to fetch contacts
+- Failed to update status
+- Unauthorized access
+
+// Handling:
+- Display error message in UI
+- Retry mechanism for network failures
+- Graceful degradation
+```
+
+### Route Protection
+
+```javascript
+// All admin contact routes protected with:
+- JWT authentication middleware
+- Admin role verification
+- Error responses: 401 (unauthorized), 403 (forbidden)
+```
+
+## Testing Strategy
+
+### Unit Tests
+
+**Backend:**
+```javascript
+// contactController.test.js
+- Test createContact with valid data
+- Test createContact with invalid data
+- Test getAllContacts with different filters
+- Test updateContactStatus with valid/invalid status
+- Test authorization failures
+```
+
+**Frontend:**
+```javascript
+// ContactManagement.test.jsx
+- Test contact list rendering
+- Test filter functionality
+- Test status update actions
+- Test empty state display
+- Test error handling
+```
+
+### Integration Tests
+
+```javascript
+// Contact flow end-to-end:
+1. Submit contact form (public)
+2. Verify contact saved in database
+3. Admin login
+4. Fetch contacts via API
+5. Update contact status
+6. Verify status change persisted
+```
+
+### Manual Testing Checklist
+
+**Footer Visibility:**
+- [ ] Footer visible on home page
+- [ ] Footer visible on fleet page
+- [ ] Footer visible on contact page
+- [ ] Footer hidden on /admin
+- [ ] Footer hidden on /admin/contacts
+- [ ] Footer hidden on all admin subroutes
+
+**Contact Management:**
+- [ ] Submit contact form successfully
+- [ ] View submission in admin panel
+- [ ] Filter by pending status
+- [ ] Filter by resolved status
+- [ ] Mark contact as resolved
+- [ ] Mark contact as pending
+- [ ] View full message text
+- [ ] Check timestamp accuracy
+
+**Home Page:**
+- [ ] Hero section displays properly
+- [ ] No emoji symbols visible
+- [ ] Stats section modern design
+- [ ] Responsive on mobile
+- [ ] Responsive on tablet
+- [ ] All hover effects working
+- [ ] CTA buttons functional
+- [ ] Page loads within 3 seconds
+
+## Performance Considerations
+
+### Database Queries
+- Index on `status` field for fast filtering
+- Index on `createdAt` for efficient sorting
+- Pagination for contact list (implement if list grows large)
+
+### Frontend Optimization
+- Lazy load admin contact management component
+- Debounce filter changes
+- Optimize images in home page components
+- Use CSS transforms for animations (better performance)
+
+### Caching Strategy
+- Cache admin stats (including contact count)
+- Cache duration: 5 minutes
+- Invalidate on status update
+
+## Security Considerations
+
+### Input Validation
+```javascript
+// Backend validation:
+- Email format validation
+- Phone number format (optional)
+- Message length limits (min: 10, max: 1000 characters)
+- Name length limits
+- HTML sanitization to prevent XSS
+```
+
+### Rate Limiting
+```javascript
+// Contact form submission:
+- Limit: 5 submissions per IP per hour
+- Prevents spam and abuse
+- Return 429 status when exceeded
+```
+
+### Authentication
+- All admin contact routes require JWT authentication
+- Role-based access control (admin role only)
+- Token expiration handling
+
+## Deployment Notes
+
+### Database Migration
+```javascript
+// No migration needed - new collection will be created automatically
+// Optional: Create indexes manually for better performance
+db.contacts.createIndex({ status: 1 })
+db.contacts.createIndex({ createdAt: -1 })
+```
+
+### Environment Variables
+No new environment variables required - uses existing auth and database configuration.
+
+### Rollback Plan
+- Footer changes can be reverted by removing conditional rendering
+- Contact system can be disabled by removing routes
+- Home page changes are pure frontend - easy to revert
+
+## Future Enhancements
+
+### Contact Management
+- Email notifications to admin on new submission
+- Auto-reply email to user
+- Contact categorization (inquiry, support, feedback)
+- Admin response field
+- Export contacts to CSV
+
+### Home Page
+- A/B testing for hero section
+- Animated statistics counter
+- Customer testimonials carousel
+- Video background option
+- Newsletter signup integration
+
+### Admin Features
+- Contact analytics dashboard
+- Response time tracking
+- User sentiment analysis
+- Bulk status updates

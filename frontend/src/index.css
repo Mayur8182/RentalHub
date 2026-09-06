@@ -1,0 +1,62 @@
+:root {
+  --black: #111111;
+  --white: #FFFFFF;
+  --dudhiya: #F4F1E8;
+  --light-grey: #E8E8E8;
+  --dark-grey: #555555;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--black);
+  line-height: 1.6;
+  background-color: var(--white);
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dudhiya);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--dark-grey);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--black);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--black);
+  color: var(--white);
+}

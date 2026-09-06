@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build output
+frontend/dist/
+frontend/.vite/
+
+# Environment secrets — NEVER commit these
+backend/.env
+backend/.env.production
+frontend/.env
+frontend/.env.production
+.env
+.env.*
+
+# SSL certificates
+nginx/ssl/
+
+# Logs
+nginx/logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.idea/
