@@ -1,0 +1,123 @@
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  COPY-PASTE THESE COMMANDS ON YOUR EC2 INSTANCE
+  EC2 IP : 44.220.153.2
+  Domain : rentcarhub.duckdns.org
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 0 — SSH into EC2 (run on your Windows machine first)
+─────────────────────────────────────────────────────────
+ssh -i "your-key.pem" ubuntu@44.220.153.2
+
+
+STEP 1 — Install Docker (run once, on first login)
+─────────────────────────────────────────────────────────
+sudo apt-get update -y
+sudo apt-get install -y ca-certificates curl gnupg git
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu jammy stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt-get update -y
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo usermod -aG docker ubuntu
+newgrp docker
+
+
+STEP 2 — Clone the repository
+─────────────────────────────────────────────────────────
+git clone https://github.com/Mayur8182/RentalHub.git
+cd RentalHub
+
+
+STEP 3 — Create environment files (ALREADY has your MongoDB URL)
+─────────────────────────────────────────────────────────
+mkdir -p nginx/ssl nginx/logs
+sudo mkdir -p /var/www/certbot
+
+cat > backend/.env.production << 'EOF'
+PORT=5000
+NODE_ENV=production
+MONGO_URI=mongodb+srv://mkbharvad8080:Mkb%408080@cluster0.a82h2.mongodb.net/rentalhub?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=7f3a9c2e1b8d4f6e0a5c7d9b2e4f1a8c3d6e9b2f5a8c1d4e7f0a3b6c9d2e5f8a1b4c7d0e3f6a9b2c5d8e1f4a7b0c3d6e9f2a5b8c1d4e7f0a3b6
+FRONTEND_URL=http://rentcarhub.duckdns.org
+EOF
+
+cat > frontend/.env.production << 'EOF'
+VITE_API_URL=http://rentcarhub.duckdns.org
+EOF
+
+
+STEP 4 — Build and start everything
+─────────────────────────────────────────────────────────
+sudo docker compose up -d --build
+
+
+STEP 5 — Wait ~3 minutes, then verify
+─────────────────────────────────────────────────────────
+sudo docker compose ps
+
+# You should see all 3 containers: Up (healthy)
+# ┌────────────────────┬─────────────────┐
+# │ rentalhub-backend  │ Up (healthy)    │
+# │ rentalhub-frontend │ Up (healthy)    │
+# │ rentalhub-proxy    │ Up              │
+# └────────────────────┴─────────────────┘
+
+curl http://localhost/api/vehicles
+# Should return: [] or a JSON array of vehicles
+
+
+STEP 6 — Seed initial data (first time only)
+─────────────────────────────────────────────────────────
+sudo docker compose exec backend node seedData.js
+
+# Default logins after seeding:
+# Admin → admin@rentalhub.com / admin123
+# User  → user@rentalhub.com  / user123
+
+
+STEP 7 — Test in browser
+─────────────────────────────────────────────────────────
+Open: http://rentcarhub.duckdns.org
+Or:   http://44.220.153.2  (direct IP)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  USEFUL COMMANDS AFTER DEPLOYMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# View all logs live
+sudo docker compose logs -f
+
+# View only backend logs
+sudo docker compose logs -f backend
+
+# Restart backend only
+sudo docker compose restart backend
+
+# Full restart
+sudo docker compose down && sudo docker compose up -d
+
+# Update to latest code from GitHub
+git pull origin main && sudo docker compose up -d --build
+
+# Check disk space
+df -h
+
+# Container resource usage
+sudo docker stats
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  IF SOMETHING DOESN'T WORK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Backend not starting → check logs
+sudo docker compose logs backend
+# Most common cause: MongoDB connection. Verify Atlas allows 0.0.0.0/0
+
+# Port 80 blocked → check EC2 security group
+# Make sure port 80 is open for 0.0.0.0/0 in AWS Console
+
+# DuckDNS not resolving → update DuckDNS
+# Go to https://duckdns.org → set rentcarhub IP to 44.220.153.2
