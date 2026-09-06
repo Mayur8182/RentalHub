@@ -1,9 +1,7 @@
 #!/bin/bash
 
-# Complete production fix with database seeding
-# Run this on EC2 server after deployment fails
-
-echo "🔧 Complete production fix with database seeding..."
+# Complete production login fix with comprehensive debugging
+echo "🔧 Production login fix with enhanced debugging..."
 
 # Create/update backend/.env.production
 cat > backend/.env.production << 'EOF'
@@ -27,51 +25,68 @@ cat > frontend/.env.production << 'EOF'
 VITE_API_URL=https://rentcarhub.duckdns.org
 EOF
 
-echo "✅ Environment files updated for HTTPS!"
+echo "✅ Environment files updated!"
 
-# Copy seed script to backend directory
+# Copy debug scripts to backend directory
+cp debug-login.js backend/
 cp production-seed.js backend/
+cp test-api-internal.js backend/
 
-echo "🧹 Cleaning Docker system..."
-
-# Complete cleanup
+echo "🧹 Complete Docker cleanup..."
 sudo docker compose down --remove-orphans --volumes
 sudo docker system prune -af --volumes
-sudo docker image prune -af
 
-echo "🔄 Fresh build and deployment..."
-
-# Fresh build with no cache
+echo "🔄 Fresh build..."
 sudo docker compose up -d --build --force-recreate --no-deps
 
 echo ""
-echo "⏰ Waiting for containers to start..."
-sleep 15
+echo "⏰ Waiting for services to start..."
+sleep 20
 
 echo "📋 Container status:"
 sudo docker compose ps
 
 echo ""
-echo "📋 Backend logs (recent):"
+echo "📋 Backend logs (initial):"
+sudo docker logs rentalhub-backend --tail 30
+
+echo ""
+echo "🔍 Enhanced diagnostics..."
+
+# Test 1: Enhanced debug
+echo "1. Running enhanced login diagnostics..."
+sudo docker exec rentalhub-backend node /app/debug-login.js 2>/dev/null || echo "⚠️  Debug script failed"
+
+# Test 2: Internal API test  
+echo ""
+echo "2. Testing internal API endpoints..."
+sudo docker exec rentalhub-backend node /app/test-api-internal.js 2>/dev/null || echo "⚠️  API test failed"
+
+# Test 3: External API test
+echo ""
+echo "3. Testing external API access..."
+response=$(curl -s -X POST https://rentcarhub.duckdns.org/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@rentalhub.com", "password": "admin123"}' 2>/dev/null || echo "API unreachable")
+
+echo "External API response: $response"
+
+# Test 4: Check logs for errors
+echo ""
+echo "4. Recent backend logs:"
 sudo docker logs rentalhub-backend --tail 20
 
-# Check if backend is healthy before seeding
 echo ""
-echo "🌱 Checking if we need to seed the database..."
-
-# Wait a bit more for MongoDB connection
-sleep 10
-
-# Run seed script inside the backend container
-echo "🌱 Seeding production database..."
-sudo docker exec rentalhub-backend node /app/production-seed.js 2>/dev/null || echo "⚠️  Container not ready for seeding, try manually: sudo docker exec rentalhub-backend node /app/production-seed.js"
-
-echo ""
-echo "🌐 Production ready!"
+echo "🎯 Summary:"
 echo "  Frontend: https://rentcarhub.duckdns.org"
-echo "  Login with: admin@rentalhub.com / admin123"
+echo "  Login: admin@rentalhub.com / admin123"
 echo ""
-echo "📊 Debug commands:"
+echo "📊 Manual debug commands:"
+echo "  Enhanced debug: sudo docker exec rentalhub-backend node /app/debug-login.js"
+echo "  API test: sudo docker exec rentalhub-backend node /app/test-api-internal.js"
+echo "  Seed data: sudo docker exec rentalhub-backend node /app/production-seed.js" 
 echo "  Backend logs: sudo docker logs rentalhub-backend --tail 50"
-echo "  Manual seed: sudo docker exec rentalhub-backend node /app/production-seed.js"
 echo "  Container status: sudo docker compose ps"
+
+echo ""
+echo "🔍 If login still fails, check the diagnostic output above for specific errors."

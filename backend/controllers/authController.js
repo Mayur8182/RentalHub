@@ -6,11 +6,31 @@ import logActivity from '../utils/logActivity.js';
 // @route   POST /api/auth/login
 // @access  Public
 export const authUser = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required' });
+        }
 
-    if (user && (await user.matchPassword(password))) {
+        // Find user by email
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Check password
+        const isPasswordMatch = await user.matchPassword(password);
+
+        if (!isPasswordMatch) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        // Generate token and send response
+        const token = generateToken(user._id);
+
         res.json({
             _id: user._id,
             name: user.name,
@@ -18,11 +38,20 @@ export const authUser = async (req, res) => {
             phone: user.phone,
             role: user.role,
             createdAt: user.createdAt,
-            token: generateToken(user._id),
+            token: token,
         });
-        logActivity({ action: `${user.name} logged in`, category: 'auth', performedBy: user, ip: req.ip });
-    } else {
-        res.status(401).json({ message: 'Invalid email or password' });
+
+        // Log activity (non-blocking)
+        logActivity({ 
+            action: `${user.name} logged in`, 
+            category: 'auth', 
+            performedBy: user, 
+            ip: req.ip 
+        }).catch(err => console.error('Activity log error:', err));
+
+    } catch (error) {
+        console.error('Login error:', error);
+        res.status(500).json({ message: 'Server error during login' });
     }
 };
 
