@@ -25,6 +25,7 @@ import BookingDetail from './pages/BookingDetail';
 import FAQ from './pages/FAQ';
 import NotFound from './pages/NotFound';
 import InvoicePage from './pages/InvoicePage';
+import Chat from './pages/Chat';
 
 import AdminDashboard from './admin/Dashboard';
 import VehicleManagement from './admin/VehicleManagement';
@@ -57,6 +58,7 @@ function AppContent() {
           <Route path="/forgot-password"   element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/faq"               element={<FAQ />} />
+          <Route path="/chat"              element={<Chat />} />
           <Route 
             path="/bookings/:id" 
             element={

@@ -178,6 +178,10 @@ function Profile() {
                               style={{ fontSize: 12, padding: '4px 10px', background: '#F3F4F6', border: '1px solid #E8E8E8', borderRadius: 4, textDecoration: 'none', color: '#374151', fontWeight: 600 }}>
                               Details
                             </Link>
+                            <Link to={`/chat?room=${b._id.slice(-6).toUpperCase()}`}
+                              style={{ fontSize: 12, padding: '4px 10px', background: '#EDE9FE', border: '1px solid #C4B5FD', borderRadius: 4, textDecoration: 'none', color: '#6D28D9', fontWeight: 600 }}>
+                              💬 Chat
+                            </Link>
                             {b.status === 'Pending' && (
                               <button onClick={() => handleCancel(b._id)}
                                 style={{ fontSize: 12, padding: '4px 10px', background: '#FEE2E2', border: '1px solid #FECACA', borderRadius: 4, color: '#B91C1C', fontWeight: 600, cursor: 'pointer' }}>

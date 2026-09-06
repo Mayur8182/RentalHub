@@ -69,6 +69,9 @@ function Navbar() {
                   <Link className="nav-link" to="/my-bookings">MY BOOKINGS</Link>
                 </li>
                 <li className="nav-item">
+                  <Link className="nav-link" to="/chat">💬 CHAT</Link>
+                </li>
+                <li className="nav-item">
                   <button 
                     className="nav-link nav-link-logout" 
                     onClick={handleLogout}
