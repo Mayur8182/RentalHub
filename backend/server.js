@@ -171,6 +171,82 @@ app.use('/api/coupons',     couponRoutes);
 app.use('/api/damage',      damageRoutes);
 app.use('/api/maintenance', maintenanceRoutes);
 
+// ── Secret / Ephemeral Chat namespace (/secret) ───────────────────────────
+// No login, no DB, max 2 per room, messages are relay-only (never stored).
+// The room code itself is the shared secret — both users must know it.
+
+const secretRooms = {};  // { roomCode: [ { socketId, name } ] }
+
+const secret = io.of('/secret');
+
+secret.on('connection', (socket) => {
+
+    socket.on('joinSecret', ({ roomCode, name }) => {
+        const code = roomCode?.toUpperCase()?.replace(/[^A-Z0-9]/g, '').slice(0, 12);
+        const displayName = name?.trim().slice(0, 30);
+        if (!code || !displayName) { socket.emit('error', 'Invalid code or name.'); return; }
+
+        if (!secretRooms[code]) secretRooms[code] = [];
+
+        // Max 2 users per room
+        if (secretRooms[code].length >= 2) {
+            socket.emit('roomFull', 'This room already has 2 people. Use a different code.');
+            return;
+        }
+
+        // Reject if same socket already in room
+        if (secretRooms[code].some(u => u.id === socket.id)) return;
+
+        secretRooms[code].push({ id: socket.id, name: displayName });
+        socket.join(code);
+        socket.secretRoom = code;
+        socket.secretName = displayName;
+
+        socket.emit('joinedSecret', { code, name: displayName, count: secretRooms[code].length });
+
+        // Notify the other person
+        socket.to(code).emit('partnerJoined', { name: displayName });
+
+        // Broadcast updated count
+        secret.to(code).emit('roomCount', secretRooms[code].length);
+    });
+
+    // Relay encrypted message — server never decrypts, just forwards
+    socket.on('secretMessage', ({ roomCode, encryptedText, msgId }) => {
+        const code = roomCode?.toUpperCase();
+        if (!code || !encryptedText) return;
+
+        const payload = {
+            msgId:         msgId || Date.now().toString(),
+            encryptedText,
+            senderName:    socket.secretName,
+            senderId:      socket.id,
+            ts:            Date.now(),
+        };
+
+        // Send to the OTHER person only (not back to sender)
+        socket.to(code).emit('secretMessage', payload);
+    });
+
+    // Typing
+    socket.on('secretTyping', ({ roomCode, isTyping }) => {
+        socket.to(roomCode?.toUpperCase()).emit('partnerTyping', {
+            name: socket.secretName, isTyping,
+        });
+    });
+
+    // Disconnect
+    socket.on('disconnect', () => {
+        const code = socket.secretRoom;
+        if (code && secretRooms[code]) {
+            secretRooms[code] = secretRooms[code].filter(u => u.id !== socket.id);
+            secret.to(code).emit('partnerLeft', { name: socket.secretName });
+            secret.to(code).emit('roomCount', secretRooms[code].length);
+            if (secretRooms[code].length === 0) delete secretRooms[code];
+        }
+    });
+});
+
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
     console.log(`Server + Socket.IO running on port ${PORT}`);

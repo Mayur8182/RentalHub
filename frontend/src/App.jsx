@@ -26,6 +26,7 @@ import FAQ from './pages/FAQ';
 import NotFound from './pages/NotFound';
 import InvoicePage from './pages/InvoicePage';
 import Chat from './pages/Chat';
+import SecretChat from './pages/SecretChat';
 
 import AdminDashboard from './admin/Dashboard';
 import VehicleManagement from './admin/VehicleManagement';
@@ -59,6 +60,7 @@ function AppContent() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/faq"               element={<FAQ />} />
           <Route path="/chat"              element={<Chat />} />
+          <Route path="/secret"            element={<SecretChat />} />
           <Route 
             path="/bookings/:id" 
             element={
