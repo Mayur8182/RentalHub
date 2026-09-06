@@ -5,42 +5,53 @@ dotenv.config();
 
 const connectDB = async (retries = 5) => {
     try {
-        // Minimal connection options for compatibility
         const options = {
-            serverSelectionTimeoutMS: 10000, // 10 seconds timeout
-            socketTimeoutMS: 45000, // Close sockets after 45 seconds
-            maxPoolSize: 10, // Maintain up to 10 socket connections
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
+            maxPoolSize: 10,
+            bufferCommands: false,
         };
 
-        const conn = await mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rentalhub', options);
+        const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/rentalhub';
+
+        const conn = await mongoose.connect(mongoUri, options);
+
         console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-        
-        // Handle connection events
+
         mongoose.connection.on('error', (err) => {
-            console.error('MongoDB connection error:', err);
+            console.error('❌ MongoDB connection error:', err);
         });
 
         mongoose.connection.on('disconnected', () => {
-            console.log('MongoDB disconnected');
+            console.log('⚠️ MongoDB disconnected');
         });
 
-        // Graceful shutdown
-        process.on('SIGINT', async () => {
-            await mongoose.connection.close();
-            console.log('MongoDB connection closed through app termination');
-            process.exit(0);
-        });
+        const gracefulShutdown = async () => {
+            try {
+                await mongoose.connection.close();
+                console.log('MongoDB connection closed through app termination');
+                process.exit(0);
+            } catch (error) {
+                console.error('Error closing MongoDB connection:', error);
+                process.exit(1);
+            }
+        };
 
+        process.on('SIGINT', gracefulShutdown);
+        process.on('SIGTERM', gracefulShutdown);
+
+        return conn;
     } catch (error) {
-        console.error(`❌ MongoDB connection failed: ${error.message}`);
-        
+        console.error('❌ MongoDB connection failed:', error.message);
+
         if (retries > 0) {
-            console.log(`⏳ Retrying connection in 5 seconds... (${retries} attempts left)`);
-            setTimeout(() => connectDB(retries - 1), 5000);
-        } else {
-            console.error('❌ All connection attempts failed. Exiting...');
-            process.exit(1);
+            console.log(`🔄 Retrying MongoDB connection... (${retries} attempts left)`);
+            await new Promise((resolve) => setTimeout(resolve, 5000));
+            return connectDB(retries - 1);
         }
+
+        console.error('❌ All MongoDB connection attempts failed. Exiting...');
+        process.exit(1);
     }
 };
 

@@ -17,6 +17,7 @@ const httpServer = createServer(app);
 // ── CORS ─────────────────────────────────────────────────────────────────────
 const allowedOrigins = [
     process.env.FRONTEND_URL || 'http://localhost:5173',
+    'https://rentcarhub.duckdns.org',
     'http://rentcarhub.duckdns.org',
     'http://rentcarhub.duckdns.org:3000',
     'http://44.220.153.2',

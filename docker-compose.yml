@@ -25,7 +25,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: http://rentcarhub.duckdns.org:5000
+        VITE_API_URL: https://rentcarhub.duckdns.org
     container_name: rentalhub-frontend
     restart: unless-stopped
     depends_on:
