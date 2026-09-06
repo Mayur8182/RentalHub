@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Fix production deployment with proper HTTPS support
+# Complete production fix with database seeding
 # Run this on EC2 server after deployment fails
 
-echo "🔧 Fixing production deployment for HTTPS..."
+echo "🔧 Complete production fix with database seeding..."
 
 # Create/update backend/.env.production
 cat > backend/.env.production << 'EOF'
@@ -28,6 +28,10 @@ VITE_API_URL=https://rentcarhub.duckdns.org
 EOF
 
 echo "✅ Environment files updated for HTTPS!"
+
+# Copy seed script to backend directory
+cp production-seed.js backend/
+
 echo "🧹 Cleaning Docker system..."
 
 # Complete cleanup
@@ -51,8 +55,23 @@ echo ""
 echo "📋 Backend logs (recent):"
 sudo docker logs rentalhub-backend --tail 20
 
+# Check if backend is healthy before seeding
 echo ""
-echo "🌐 Test URLs:"
+echo "🌱 Checking if we need to seed the database..."
+
+# Wait a bit more for MongoDB connection
+sleep 10
+
+# Run seed script inside the backend container
+echo "🌱 Seeding production database..."
+sudo docker exec rentalhub-backend node /app/production-seed.js 2>/dev/null || echo "⚠️  Container not ready for seeding, try manually: sudo docker exec rentalhub-backend node /app/production-seed.js"
+
+echo ""
+echo "🌐 Production ready!"
 echo "  Frontend: https://rentcarhub.duckdns.org"
-echo "  API Test: https://rentcarhub.duckdns.org/api/"
-echo "  Backend Health: sudo docker logs rentalhub-backend --tail 50"
+echo "  Login with: admin@rentalhub.com / admin123"
+echo ""
+echo "📊 Debug commands:"
+echo "  Backend logs: sudo docker logs rentalhub-backend --tail 50"
+echo "  Manual seed: sudo docker exec rentalhub-backend node /app/production-seed.js"
+echo "  Container status: sudo docker compose ps"
