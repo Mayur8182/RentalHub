@@ -65,7 +65,7 @@ function UserManagement() {
   };
 
   const handleDelete = async (user) => {
-    if (!window.confirm(`Delete user "${user.name}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete user "${String(user.name)}"? This cannot be undone.`)) return;
     try {
       await adminAPI.deleteUser(user._id);
       fetchData();
