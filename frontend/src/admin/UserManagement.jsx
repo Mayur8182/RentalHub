@@ -65,7 +65,8 @@ function UserManagement() {
   };
 
   const handleDelete = async (user) => {
-    if (!window.confirm(`Delete user "${user.name}"? This cannot be undone.`)) return;
+    const confirmMsg = "Are you sure you want to remove coupon: " + String(code || "");
+    if (!window.confirm(confirmMsg)) return;
     try {
       await adminAPI.deleteUser(user._id);
       fetchData();
