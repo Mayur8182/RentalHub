@@ -1,3 +1,4 @@
+# Security hardened via THING Security Platform
 name: Deploy to EC2 — rentcarhub.duckdns.org
 
 on:
