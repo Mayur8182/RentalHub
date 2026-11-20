@@ -162,7 +162,8 @@ export const forgotPassword = async (req, res) => {
             resetPasswordExpires: new Date(Date.now() + 60 * 60 * 1000), // 1 hour
         });
 
-        const resetUrl = `http://localhost:5173/reset-password/${token}`;
+        const frontendBase = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',')[0].trim().replace(/\/+$/, '');
+        const resetUrl = `${frontendBase}/reset-password/${token}`;
 
         // In production you would send an email here.
         // For dev we return the URL directly so it works without SMTP.

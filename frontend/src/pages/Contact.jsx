@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Hero from '../components/Hero';
+import { contactAPI } from '../utils/api';
 import './Contact.css';
 
 function Contact() {
@@ -27,32 +28,20 @@ function Contact() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      await contactAPI.create(formData);
+
+      setSubmitted(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        message: ''
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSubmitted(true);
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          message: ''
-        });
-        setTimeout(() => {
-          setSubmitted(false);
-        }, 5000);
-      } else {
-        setError(data.message || 'Failed to send message. Please try again.');
-      }
+      setTimeout(() => {
+        setSubmitted(false);
+      }, 5000);
     } catch (err) {
-      setError('Network error. Please check your connection and try again.');
+      setError(err.response?.data?.message || 'Failed to send message. Please try again.');
     } finally {
       setLoading(false);
     }

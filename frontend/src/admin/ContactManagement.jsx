@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LayoutDashboard, Car, FolderTree, FileText, Users, ArrowLeft, MessageSquare, TrendingUp, Activity } from 'lucide-react';
+import { contactAPI } from '../utils/api';
 import './Dashboard.css';
 
 function ContactManagement() {
@@ -17,49 +18,21 @@ function ContactManagement() {
   const fetchContacts = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/contacts/admin/contacts?status=${filter}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setContacts(data.contacts || []);
-      } else {
-        setError(data.message || 'Failed to fetch contacts');
-      }
+      const res = await contactAPI.getAll(filter);
+      setContacts(res.data?.contacts || []);
       setLoading(false);
     } catch (err) {
-      setError('Network error. Failed to fetch contacts.');
+      setError(err.response?.data?.message || 'Network error. Failed to fetch contacts.');
       setLoading(false);
     }
   };
 
   const handleStatusChange = async (contactId, newStatus) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/contacts/admin/contacts/${contactId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ status: newStatus }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Refresh contacts list
-        fetchContacts();
-      } else {
-        alert(data.message || 'Failed to update status');
-      }
+      await contactAPI.updateStatus(contactId, newStatus);
+      fetchContacts();
     } catch (err) {
-      alert('Network error. Failed to update status.');
+      alert(err.response?.data?.message || 'Failed to update status.');
     }
   };
 

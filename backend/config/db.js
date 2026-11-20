@@ -1,7 +1,15 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import dns from 'dns';
 
 dotenv.config();
+
+// Ensure reliable SRV DNS resolution on Windows / local environments
+try {
+    dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch {
+    // Fall back to system resolver if setting fails
+}
 
 const connectDB = async (retries = 5) => {
     try {

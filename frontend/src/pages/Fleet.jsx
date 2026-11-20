@@ -70,7 +70,7 @@ function Fleet() {
 
     setCheckingAvailability(true);
     const availabilityResults = {};
-    const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
 
     try {
       // Check availability for each vehicle

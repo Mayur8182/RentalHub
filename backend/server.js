@@ -4,6 +4,9 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 import connectDB from './config/db.js';
 import ChatMessage from './models/ChatMessage.js';
 import User from './models/User.js';
@@ -11,28 +14,53 @@ import User from './models/User.js';
 dotenv.config();
 connectDB();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const httpServer = createServer(app);
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
-const allowedOrigins = [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'https://rentcarhub.duckdns.org',
-    'http://rentcarhub.duckdns.org',
-    'http://rentcarhub.duckdns.org:3000',
-    'http://44.220.153.2',
-    'http://44.220.153.2:3000',
-    'http://localhost:5173',
-    'http://localhost:3000',
-];
+const explicitOrigins = (process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((u) => u.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
 
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+const isOriginAllowed = (origin) => {
+    if (!origin) return true; // Server-to-server, mobile apps, curl, health checks
+    const cleanOrigin = origin.replace(/\/+$/, '');
+    if (explicitOrigins.includes(cleanOrigin)) return true;
+    if (cleanOrigin.endsWith('.onrender.com')) return true;
+    if (cleanOrigin.includes('localhost') || cleanOrigin.includes('127.0.0.1')) return true;
+    if (cleanOrigin.includes('rentcarhub.duckdns.org') || cleanOrigin.includes('44.220.153.2')) return true;
+    return false;
+};
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (isOriginAllowed(origin)) {
+            callback(null, true);
+        } else {
+            console.warn(`[CORS] Rejected origin: ${origin}`);
+            callback(new Error(`Not allowed by CORS: ${origin}`));
+        }
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // ── Socket.IO ─────────────────────────────────────────────────────────────────
 const io = new Server(httpServer, {
     cors: {
-        origin: allowedOrigins,
+        origin: (origin, callback) => {
+            if (isOriginAllowed(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error(`Socket CORS rejected: ${origin}`));
+            }
+        },
         methods: ['GET', 'POST'],
         credentials: true,
     },
@@ -138,6 +166,7 @@ io.on('connection', (socket) => {
 
 // ── REST routes ───────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.send('RentalHub API is running...'));
+app.get('/api/health', (req, res) => res.json({ status: 'ok', uptime: process.uptime(), timestamp: new Date() }));
 
 import authRoutes from './routes/authRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -249,6 +278,18 @@ secret.on('connection', (socket) => {
         }
     });
 });
+
+// ── Production Frontend Static Serving (Optional Single-Service Deploy) ──────
+const frontendDist = path.join(__dirname, '../frontend/dist');
+if (fs.existsSync(frontendDist)) {
+    app.use(express.static(frontendDist));
+    app.get('*', (req, res, next) => {
+        if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+            return next();
+        }
+        res.sendFile(path.join(frontendDist, 'index.html'));
+    });
+}
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {

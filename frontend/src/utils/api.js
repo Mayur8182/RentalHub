@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, ''),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -28,7 +28,11 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      const publicPaths = ['/', '/fleet', '/about', '/team', '/contact', '/login', '/register', '/faq', '/favorites'];
+      const isPublic = publicPaths.includes(window.location.pathname) || window.location.pathname.startsWith('/vehicles/');
+      if (!isPublic && window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
@@ -110,6 +114,13 @@ export const maintenanceAPI = {
   update:        (id, data)   => api.put(`/api/maintenance/${id}`, data),
   updateStatus:  (vehicleId, status) => api.put(`/api/maintenance/status/${vehicleId}`, { maintenanceStatus: status }),
   delete:        (id)         => api.delete(`/api/maintenance/${id}`),
+};
+
+// Contact API methods
+export const contactAPI = {
+  create:       (data)               => api.post('/api/contacts', data),
+  getAll:       (status = 'all')     => api.get(`/api/contacts/admin/contacts?status=${status}`),
+  updateStatus: (id, status)         => api.patch(`/api/contacts/admin/contacts/${id}/status`, { status }),
 };
 
 // Review API methods

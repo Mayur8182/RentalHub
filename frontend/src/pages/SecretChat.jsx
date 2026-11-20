@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import './SecretChat.css';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000');
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
 
 // ── AES encryption using Web Crypto API ─────────────────────────────────────
 // The room code (padded/hashed) is the shared symmetric key.

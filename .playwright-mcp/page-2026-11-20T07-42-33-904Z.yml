@@ -1,0 +1,125 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - link "RENTALHUB" [ref=e6] [cursor=pointer]:
+        - /url: /
+      - list [ref=e8]:
+        - listitem [ref=e9]:
+          - link "HOME" [ref=e10] [cursor=pointer]:
+            - /url: /
+        - listitem [ref=e11]:
+          - link "FLEET" [ref=e12] [cursor=pointer]:
+            - /url: /fleet
+        - listitem [ref=e13]:
+          - link "ABOUT" [ref=e14] [cursor=pointer]:
+            - /url: /about
+        - listitem [ref=e15]:
+          - link "TEAM" [ref=e16] [cursor=pointer]:
+            - /url: /team
+        - listitem [ref=e17]:
+          - link "CONTACT" [ref=e18] [cursor=pointer]:
+            - /url: /contact
+        - listitem [ref=e19]:
+          - link "♥" [ref=e20] [cursor=pointer]:
+            - /url: /favorites
+        - listitem [ref=e21]:
+          - link "LOGIN" [ref=e22] [cursor=pointer]:
+            - /url: /login
+        - listitem [ref=e23]:
+          - link "REGISTER" [ref=e24] [cursor=pointer]:
+            - /url: /register
+  - main [ref=e25]:
+    - generic [ref=e26]:
+      - generic [ref=e28]:
+        - heading "Our Fleet" [level=1] [ref=e29]
+        - paragraph [ref=e30]: Choose from our wide range of vehicles
+      - generic [ref=e32]:
+        - heading "Available Vehicles" [level=2] [ref=e33]
+        - generic [ref=e35]:
+          - textbox "Search vehicles by name, brand, location, or category..." [ref=e36]
+          - button "Search" [ref=e37] [cursor=pointer]
+        - generic [ref=e38]:
+          - heading "Check Availability for Specific Dates" [level=3] [ref=e39]
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - generic [ref=e42]: Pickup Date
+              - textbox [ref=e43]
+            - generic [ref=e44]:
+              - generic [ref=e45]: Return Date
+              - textbox [ref=e46]
+            - button "Check Availability" [disabled] [ref=e47]
+        - button "All Vehicles" [ref=e49] [cursor=pointer]
+        - generic [ref=e50]:
+          - generic [ref=e51]: "📍 City:"
+          - button "🌍 All Cities" [ref=e52] [cursor=pointer]
+        - generic [ref=e53]:
+          - generic [ref=e54]: "Sort By:"
+          - combobox [ref=e55] [cursor=pointer]:
+            - option "Default" [selected]
+            - 'option "Price: Low → High"'
+            - 'option "Price: High → Low"'
+            - option "Newest First"
+            - option "Most Popular"
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - heading "Price Range (per day)" [level=3] [ref=e59]
+            - generic [ref=e60]:
+              - generic [ref=e61] [cursor=pointer]:
+                - checkbox "Under ₹1,000" [ref=e62]
+                - generic [ref=e63]: Under ₹1,000
+              - generic [ref=e64] [cursor=pointer]:
+                - checkbox "₹1,000 - ₹3,000" [ref=e65]
+                - generic [ref=e66]: ₹1,000 - ₹3,000
+              - generic [ref=e67] [cursor=pointer]:
+                - checkbox "₹3,000 - ₹5,000" [ref=e68]
+                - generic [ref=e69]: ₹3,000 - ₹5,000
+              - generic [ref=e70] [cursor=pointer]:
+                - checkbox "₹5,000+" [ref=e71]
+                - generic [ref=e72]: ₹5,000+
+          - generic [ref=e73]:
+            - heading "Availability" [level=3] [ref=e74]
+            - generic [ref=e75] [cursor=pointer]:
+              - checkbox "Show Available Only" [ref=e76]
+              - generic [ref=e77]: Show Available Only
+  - contentinfo [ref=e121]:
+    - generic [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - heading "🚗 RENTALHUB" [level=3] [ref=e125]
+          - paragraph [ref=e126]: Your trusted partner for premium vehicle rentals. We offer a wide range of vehicles with competitive pricing and exceptional service.
+        - generic [ref=e127]:
+          - heading "QUICK LINKS" [level=4] [ref=e128]
+          - list [ref=e129]:
+            - listitem [ref=e130]:
+              - link "Home" [ref=e131] [cursor=pointer]:
+                - /url: /
+            - listitem [ref=e132]:
+              - link "Fleet" [ref=e133] [cursor=pointer]:
+                - /url: /fleet
+            - listitem [ref=e134]:
+              - link "About" [ref=e135] [cursor=pointer]:
+                - /url: /about
+            - listitem [ref=e136]:
+              - link "Team" [ref=e137] [cursor=pointer]:
+                - /url: /team
+            - listitem [ref=e138]:
+              - link "Contact" [ref=e139] [cursor=pointer]:
+                - /url: /contact
+        - generic [ref=e140]:
+          - heading "ACCOUNT" [level=4] [ref=e141]
+          - list [ref=e142]:
+            - listitem [ref=e143]:
+              - link "Login" [ref=e144] [cursor=pointer]:
+                - /url: /login
+            - listitem [ref=e145]:
+              - link "Register" [ref=e146] [cursor=pointer]:
+                - /url: /register
+            - listitem [ref=e147]:
+              - link "My Dashboard" [ref=e148] [cursor=pointer]:
+                - /url: /profile
+        - generic [ref=e149]:
+          - heading "CONTACT US" [level=4] [ref=e150]
+          - paragraph [ref=e151]: 📍 7th Floor, Premchand House, Ashram Road, Ahmedabad – 380009
+          - paragraph [ref=e152]: 📞 +91 96389 37336
+          - paragraph [ref=e153]: ✉️ contact@brainybeam.com
+      - paragraph [ref=e155]: © 2026 RentalHub. All rights reserved. | Developed by Mayurbhai Bharvad
