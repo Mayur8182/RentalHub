@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { vehicleAPI, categoryAPI } from '../utils/api';
+import { vehicleAPI, categoryAPI, getBaseURL } from '../utils/api';
 import Hero from '../components/Hero';
 import FavoriteButton from '../components/FavoriteButton';
 import { VehicleCardSkeleton } from '../components/Skeleton';
@@ -40,8 +40,8 @@ function Fleet() {
         vehicleAPI.getAll(),
         categoryAPI.getAll()
       ]);
-      setVehicles(vehiclesRes.data);
-      setCategories(categoriesRes.data || []);
+      setVehicles(Array.isArray(vehiclesRes.data) ? vehiclesRes.data : []);
+      setCategories(Array.isArray(categoriesRes.data) ? categoriesRes.data : []);
       setLoading(false);
     } catch (err) {
       setError('Failed to load vehicles');
@@ -70,7 +70,7 @@ function Fleet() {
 
     setCheckingAvailability(true);
     const availabilityResults = {};
-    const baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
+    const baseURL = getBaseURL();
 
     try {
       // Check availability for each vehicle

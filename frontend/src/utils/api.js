@@ -1,7 +1,19 @@
 import axios from 'axios';
 
+export const getBaseURL = () => {
+  let url = (import.meta.env.VITE_API_URL || 'http://localhost:5000').trim().replace(/\/+$/, '');
+  // If Render injected bare hostname like "rentalhub-backend-kkv3" or "rentalhub-backend-kkv3.onrender.com"
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    if (!url.includes('.')) {
+      url = `${url}.onrender.com`;
+    }
+    url = `https://${url}`;
+  }
+  return url;
+};
+
 const api = axios.create({
-  baseURL: (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, ''),
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },

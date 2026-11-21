@@ -34,7 +34,4 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: rentalhub-backend
-          property: host
+        value: https://rentalhub-backend-kkv3.onrender.com

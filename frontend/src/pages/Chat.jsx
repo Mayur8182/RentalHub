@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useAuth } from '../context/AuthContext';
+import { getBaseURL } from '../utils/api';
 import './Chat.css';
 
-const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/+$/, '');
+const API_BASE = getBaseURL();
 
 // Format time: today → "3:45 PM", older → "Jun 5, 3:45 PM"
 function fmtTime(dateStr) {

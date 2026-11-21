@@ -111,7 +111,7 @@ function MyBookings() {
     try {
       setLoading(true);
       const res = await bookingAPI.getMyBookings();
-      const data = res.data;
+      const data = Array.isArray(res.data) ? res.data : [];
       setBookings(data);
       setFilteredBookings(data);
 

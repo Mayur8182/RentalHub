@@ -1,3 +1,4 @@
+import { Component } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import { AuthProvider } from './context/AuthContext';
@@ -173,15 +174,57 @@ function AppContent() {
   );
 }
 
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('App ErrorBoundary caught:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '80px 20px', textAlign: 'center', fontFamily: 'sans-serif' }}>
+          <h2 style={{ fontSize: '28px', marginBottom: '12px', color: '#111' }}>Something went wrong</h2>
+          <p style={{ color: '#666', marginBottom: '24px' }}>
+            {this.state.error?.message || 'An unexpected error occurred while loading this page.'}
+          </p>
+          <button
+            onClick={() => { window.location.href = '/'; }}
+            style={{
+              padding: '12px 28px',
+              backgroundColor: '#111',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: '600'
+            }}
+          >
+            Go to Home Page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
   return (
-    <AuthProvider>
-      <FavoritesProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </FavoritesProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <FavoritesProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </FavoritesProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
